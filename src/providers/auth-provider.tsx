@@ -35,7 +35,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast()
 
   useEffect(() => {
-    // Check if user is already logged in
     const storedUser = localStorage.getItem(config.auth.userStorageKey)
     const storedTokens = localStorage.getItem(config.auth.tokenStorageKey)
 
