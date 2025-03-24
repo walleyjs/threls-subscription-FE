@@ -66,13 +66,6 @@ export default function DashboardLayout({
               <CreditCard className="mr-3 h-5 w-5" />
               Payment Methods
             </Link>
-            <Link
-              href="/dashboard/settings"
-              className="mt-2 flex items-center rounded-md px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white"
-            >
-              <Settings className="mr-3 h-5 w-5" />
-              Settings
-            </Link>
             <Button
               variant="ghost"
               className="mt-6 flex w-full items-center rounded-md px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white"
