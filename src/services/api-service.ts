@@ -151,6 +151,25 @@ class ApiService {
     return this.handleResponse<any>(response)
   }
 
+  async updatePlan(planId: string, planData: any): Promise<any> {
+    const response = await fetch(`${this.baseUrl}/admin/update-plan/${planId}`, {
+      method: "PUT",
+      headers: this.getHeaders(),
+      body: JSON.stringify(planData),
+    })
+
+    return this.handleResponse<any>(response)
+  }
+
+  async deletePlan(id: string): Promise<any> {
+    const response = await fetch(`${this.baseUrl}/admin/delete-plan/${id}`, {
+      method: "PUT",
+      headers: this.getHeaders(),
+    })
+
+    return this.handleResponse<any>(response)
+  }
+
   async getFeatures(): Promise<any> {
     const response = await fetch(`${this.baseUrl}/admin/features`, {
       headers: this.getHeaders(),
@@ -164,6 +183,51 @@ class ApiService {
       method: "POST",
       headers: this.getHeaders(),
       body: JSON.stringify(featureData),
+    })
+
+    return this.handleResponse<any>(response)
+  }
+
+  async getWebhooks(): Promise<any[]> {
+    const response = await fetch(`${this.baseUrl}/webhook`, {
+      headers: this.getHeaders(),
+    })
+
+    return this.handleResponse<any[]>(response)
+  }
+
+  async getWebhook(id: string): Promise<any> {
+    const response = await fetch(`${this.baseUrl}/webhook/${id}`, {
+      headers: this.getHeaders(),
+    })
+
+    return this.handleResponse<any>(response)
+  }
+
+  async createWebhook(webhookData: any): Promise<any> {
+    const response = await fetch(`${this.baseUrl}/webhook/create`, {
+      method: "POST",
+      headers: this.getHeaders(),
+      body: JSON.stringify(webhookData),
+    })
+
+    return this.handleResponse<any>(response)
+  }
+
+  async updateWebhook(id: string, webhookData: any): Promise<any> {
+    const response = await fetch(`${this.baseUrl}/webhook/update/${id}`, {
+      method: "PUT",
+      headers: this.getHeaders(),
+      body: JSON.stringify(webhookData),
+    })
+
+    return this.handleResponse<any>(response)
+  }
+
+  async deleteWebhook(id: string): Promise<any> {
+    const response = await fetch(`${this.baseUrl}/webhook/${id}`, {
+      method: "DELETE",
+      headers: this.getHeaders(),
     })
 
     return this.handleResponse<any>(response)

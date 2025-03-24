@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { CreditCard, Home, LogOut, Settings, User } from "lucide-react"
+import { CreditCard, Home, LogOut, ExternalLink } from "lucide-react"
 import { RoleBasedRouter } from "@/providers/role-based-router"
 
 export default function DashboardLayout({
@@ -65,6 +65,13 @@ export default function DashboardLayout({
             >
               <CreditCard className="mr-3 h-5 w-5" />
               Payment Methods
+            </Link>
+            <Link
+              href="/dashboard/webhooks"
+              className="mt-2 flex items-center rounded-md px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white"
+            >
+              <ExternalLink className="mr-3 h-5 w-5" />
+              Webhooks
             </Link>
             <Button
               variant="ghost"

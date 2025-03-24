@@ -74,8 +74,7 @@ export function FeatureManagement({ selectedFeatures, onFeaturesChange }: Featur
     try {
       setIsLoading(true)
       const data = await apiService.getFeatures()
- 
-console.log("data", data)
+
      
         setAvailableFeatures(data.data)
    
@@ -162,12 +161,7 @@ console.log("data", data)
         isDeleted: false,
       }
 
-      // Send the request
       const data = await apiService.createFeature(featureData)
-
-    
-
-      
         fetchFeatures()
         setFeatureName("")
         setFeatureDescription("")

@@ -30,6 +30,9 @@ export default function AdminPlansPage() {
   const [trialPeriodDays, setTrialPeriodDays] = useState("0")
   const [displayOrder, setDisplayOrder] = useState("0")
   const [planFeatures, setPlanFeatures] = useState<any[]>([])
+  const [isDeleting, setIsDeleting] = useState<string | null>(null)
+  const [isEditingPlan, setIsEditingPlan] = useState(false)
+  const [currentPlan, setCurrentPlan] = useState<any>(null)
 
   useEffect(() => {
     fetchPlans()
@@ -99,6 +102,75 @@ export default function AdminPlansPage() {
     }
   }
 
+  const handleUpdatePlan = async (e: React.FormEvent) => {
+         e.preventDefault()
+     
+         try {
+           if (!planName || !planDescription || !planPrice) {
+             toast({
+               title: "Validation Error",
+               description: "Please fill in all required fields",
+               variant: "destructive",
+             })
+             return
+           }
+     
+           const planData = {
+             name: planName,
+             description: planDescription,
+             price: Number.parseFloat(planPrice),
+             currency: planCurrency,
+             billingCycle: planBillingCycle,
+             trialPeriodDays: Number.parseInt(trialPeriodDays),
+             displayOrder: Number.parseInt(displayOrder),
+             isActive: true,
+             features: planFeatures.map((feature) => ({
+               featureId: feature.featureId,
+               limitValue: feature.limitValue,
+             })),
+           }
+     
+           await apiService.updatePlan(currentPlan._id, planData)
+     
+           toast({
+             title: "Success",
+             description: "Plan updated successfully",
+           })
+     
+           setIsEditingPlan(false)
+           setCurrentPlan(null)
+           resetForm()
+           fetchPlans()
+         } catch (error) {
+           toast({
+             title: "Error",
+             description: "Failed to update plan. Please try again.",
+             variant: "destructive",
+           })
+         }
+       }
+
+
+       const handleDelete = async (planId: string) => {
+         setIsDeleting(planId)
+         try {
+           await apiService.deletePlan(planId)
+           toast({
+             title: "Success",
+             description: "Plan deleted successfully",
+           })
+           fetchPlans()
+         } catch (error) {
+           toast({
+             title: "Error",
+             description: "Failed to delete plan",
+             variant: "destructive",
+           })
+         } finally {
+           setIsDeleting(null)
+         }
+       }
+
   const resetForm = () => {
     setPlanName("")
     setPlanDescription("")
@@ -110,6 +182,25 @@ export default function AdminPlansPage() {
     setPlanFeatures([])
   }
 
+
+  const handleEditPlan = (plan: any) => {
+         setCurrentPlan(plan)
+         setPlanName(plan.name)
+         setPlanDescription(plan.description)
+         setPlanPrice(plan.price.toString())
+         setPlanCurrency(plan.currency)
+         setPlanBillingCycle(plan.billingCycle)
+         setTrialPeriodDays(plan.trialPeriodDays.toString())
+         setDisplayOrder(plan.displayOrder.toString())
+         setPlanFeatures(
+           plan.features.map((feature: any) => ({
+             featureId: feature.featureId || feature._id,
+             limitValue: feature.limitValue,
+           })),
+         )
+         setIsEditingPlan(true)
+       }
+
   if (isLoading) {
     return (
       <div className="loading-container">
@@ -118,17 +209,25 @@ export default function AdminPlansPage() {
     )
   }
 
-  if (isCreatingPlan) {
+  if (isCreatingPlan || isEditingPlan) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Create Subscription Plan</h1>
-          <Button variant="outline" onClick={() => setIsCreatingPlan(false)}>
+          <h1 className="text-3xl font-bold"> {isEditingPlan ? "Edit Subscription Plan" : "Create Subscription Plan"}</h1>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setIsCreatingPlan(false)
+              setIsEditingPlan(false)
+              setCurrentPlan(null)
+              resetForm()
+            }}
+          >
             Cancel
           </Button>
         </div>
 
-        <form onSubmit={handleAddPlan}>
+        <form onSubmit={isEditingPlan ? handleUpdatePlan : handleAddPlan}>
           <div className="space-y-6">
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-2">
@@ -224,7 +323,7 @@ export default function AdminPlansPage() {
 
             <div className="flex justify-end">
               <Button type="submit" size="lg">
-                Create Plan
+              {isEditingPlan ? "Update Plan" : "Create Plan"}
               </Button>
             </div>
           </div>
@@ -274,7 +373,7 @@ export default function AdminPlansPage() {
                           <Check className="mr-2 h-4 w-4 text-green-500" />
                           <span className="text-sm">
                             {feature.name}
-                            {feature.limitType !== "boolean" && `: ${feature.limitValue}`}
+                            {feature.limitType !== "boolean" && `: ${feature.value}`}
                           </span>
                         </div>
                       ))}
@@ -282,11 +381,11 @@ export default function AdminPlansPage() {
                   )}
 
                   <div className="flex justify-end space-x-2">
-                    <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => handleEditPlan(plan)}>
                       <Edit className="mr-2 h-4 w-4" /> Edit
                     </Button>
-                    <Button variant="outline" size="sm" className="text-destructive hover:text-destructive">
-                      <Trash2 className="mr-2 h-4 w-4" /> Delete
+                    <Button onClick={() => handleDelete(plan._id)} variant="outline" size="sm" className="text-destructive hover:text-destructive">
+                      <Trash2 className="mr-2 h-4 w-4" />   {isDeleting === plan._id ? "Deleting..." : "Delete"}
                     </Button>
                   </div>
                 </CardContent>
@@ -321,7 +420,7 @@ export default function AdminPlansPage() {
                           <Check className="mr-2 h-4 w-4 text-green-500" />
                           <span className="text-sm">
                             {feature.name}
-                            {feature.limitType !== "boolean" && `: ${feature.limitValue}`}
+                            {feature.limitType !== "boolean" && `: ${feature.value}`}
                           </span>
                         </div>
                       ))}
@@ -329,11 +428,11 @@ export default function AdminPlansPage() {
                   )}
 
                   <div className="flex justify-end space-x-2">
-                    <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => handleEditPlan(plan)}>
                       <Edit className="mr-2 h-4 w-4" /> Edit
                     </Button>
-                    <Button variant="outline" size="sm" className="text-destructive hover:text-destructive">
-                      <Trash2 className="mr-2 h-4 w-4" /> Delete
+                    <Button onClick={() => handleDelete(plan._id)} variant="outline" size="sm" className="text-destructive hover:text-destructive">
+                      <Trash2 className="mr-2 h-4 w-4" />   {isDeleting === plan._id ? "Deleting..." : "Delete"}
                     </Button>
                   </div>
                 </CardContent>
