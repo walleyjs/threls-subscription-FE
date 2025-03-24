@@ -132,6 +132,43 @@ class ApiService {
 
     return this.handleResponse<any>(response)
   }
+
+  async getAdminDashboardStats(): Promise<any> {
+    const response = await fetch(`${this.baseUrl}/admin/stats`, {
+      headers: this.getHeaders(),
+    })
+
+    return this.handleResponse<any>(response)
+  }
+
+  async createPlan(planData: any): Promise<any> {
+    const response = await fetch(`${this.baseUrl}/admin/create-plan`, {
+      method: "POST",
+      headers: this.getHeaders(),
+      body: JSON.stringify(planData),
+    })
+
+    return this.handleResponse<any>(response)
+  }
+
+  async getFeatures(): Promise<any> {
+    const response = await fetch(`${this.baseUrl}/admin/features`, {
+      headers: this.getHeaders(),
+    })
+
+    return this.handleResponse<any>(response)
+  }
+
+  async createFeature(featureData: any): Promise<any> {
+    const response = await fetch(`${this.baseUrl}/admin/create-feature`, {
+      method: "POST",
+      headers: this.getHeaders(),
+      body: JSON.stringify(featureData),
+    })
+
+    return this.handleResponse<any>(response)
+  }
+
 }
 
 export const apiService = new ApiService();

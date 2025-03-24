@@ -25,7 +25,7 @@ export function RoleBasedRouter({ children }: { children: React.ReactNode }) {
     if (isLoading) return
 
     if (!user) {
-
+      // Not logged in, redirect to login
       router.push("/login")
       return
     }
@@ -34,19 +34,19 @@ export function RoleBasedRouter({ children }: { children: React.ReactNode }) {
     const isCustomerRoute = pathname.startsWith("/dashboard")
 
 
-    if (user.role === "ADMIN") {
+    if (user.role === "ADMIN" || user.role=="SUPER_ADMIN") {
 
       if (isCustomerRoute) {
         router.push("/admin")
       }
     } else {
-
       if (isAdminRoute) {
         router.push("/dashboard")
       }
     }
   }, [user, isLoading, pathname, router])
 
+  // Show loading state when redirecting
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">

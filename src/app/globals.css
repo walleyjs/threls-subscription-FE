@@ -429,6 +429,17 @@
     transform: translateX(0);
   }
 
+  .select-content {
+    background-color: white;
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .dark .select-content {
+    background-color: hsl(var(--card));
+    border-color: hsl(var(--border));
+  }
+
 
 }
 
