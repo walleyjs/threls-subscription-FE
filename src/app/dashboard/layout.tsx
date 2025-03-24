@@ -52,7 +52,14 @@ export default function DashboardLayout({
               <Home className="mr-3 h-5 w-5" />
               Dashboard
             </Link>
-      
+            <Link
+              href="/dashboard/plans"
+              className="mt-2 flex items-center rounded-md px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white"
+            >
+              <CreditCard className="mr-3 h-5 w-5" />
+              Plans
+            </Link>
+            
             <Button
               variant="ghost"
               className="mt-6 flex w-full items-center rounded-md px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white"
@@ -63,8 +70,6 @@ export default function DashboardLayout({
             </Button>
           </nav>
         </div>
-
-        {/* Main content */}
         <div className="flex-1 overflow-auto">
           <div className="p-6">{children}</div>
         </div>

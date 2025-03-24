@@ -102,7 +102,7 @@ export default function DashboardPage() {
               </div>
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Next Billing Date</h3>
-                <p className="text-lg font-medium">{formatDate(subscription.nextBillingDate)}</p>
+                <p className="text-lg font-medium">{formatDate(subscription.currentPeriodEnd)}</p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Payment Method</h3>

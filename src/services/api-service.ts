@@ -68,6 +68,31 @@ class ApiService {
         return this.handleResponse<any>(response)
       }
        
+  async getPlans(): Promise<any> {
+    const response = await fetch(`${this.baseUrl}/plan/plan-features`, {
+      headers: this.getHeaders(),
+    })
+
+    return this.handleResponse<any>(response)
+  }
+
+  async getPaymentMethods(): Promise<any> {
+    const response = await fetch(`${this.baseUrl}/payment-method`, {
+      headers: this.getHeaders(),
+    })
+
+    return this.handleResponse<any>(response)
+  }
+
+  async createSubscription(planId: string, paymentMethodId: string): Promise<any> {
+    const response = await fetch(`${this.baseUrl}/subscription/create`, {
+      method: "POST",
+      headers: this.getHeaders(),
+      body: JSON.stringify({ planId, paymentMethodId }),
+    })
+
+    return this.handleResponse<any>(response)
+  }
 
 }
 
