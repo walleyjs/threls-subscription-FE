@@ -22,6 +22,7 @@ type AuthContextType = {
   tokens: Tokens | null
   isLoading: boolean
   login: (email: string, password: string) => Promise<void>
+  register: (email: string, firstName: string, lastName: string, password: string) => Promise<void>
   logout: () => void
 }
 
@@ -91,6 +92,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+
+  const register = async (email: string, firstName: string, lastName: string, password: string) => {
+    try {
+      setIsLoading(true)
+
+      const response = await fetch(`${config.api.baseUrl}/signup/basic`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, firstName, lastName, password }),
+      })
+
+      const data = await response.json()
+
+      if (data.statusCode !== "10000") {
+        throw new Error(data.message || "Registration failed")
+      }
+
+      const { user, tokens } = data.data
+      setUser(user)
+      setTokens(tokens)
+
+      localStorage.setItem(config.auth.userStorageKey, JSON.stringify(user))
+      localStorage.setItem(config.auth.tokenStorageKey, JSON.stringify(tokens))
+
+      toast({
+        title: "Success",
+        description: "You have successfully registered and logged in",
+      })
+
+      router.push("/dashboard")
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Registration failed",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const logout = () => {
     setUser(null)
     setTokens(null)
@@ -99,7 +143,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push("/login")
   }
 
-  return <AuthContext.Provider value={{ user, tokens, isLoading, login, logout }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, tokens, isLoading, login, register, logout }}>{children}</AuthContext.Provider>
 }
 
 export const useAuth = () => {

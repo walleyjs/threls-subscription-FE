@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
-import { Check } from "lucide-react"
+import { Check, CheckCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export default function PlansPage() {
@@ -26,6 +26,11 @@ export default function PlansPage() {
 
         const paymentMethodsData = await apiService.getPaymentMethods()
         setPaymentMethods(paymentMethodsData?.data)
+
+        const defaultMethod = paymentMethodsData.data.find((method: { isDefault: boolean }) => method.isDefault)
+        if (defaultMethod) {
+          setSelectedPaymentMethod(defaultMethod._id)
+        }
       } catch (error) {
         toast({
           title: "Error",
@@ -193,12 +198,21 @@ export default function PlansPage() {
                     <CardContent className="p-4">
                       <div className="flex items-center space-x-4">
                         <div className="flex-1">
-                          <p className="font-medium">
+                        <div className="flex items-center">
+                        <p className="font-medium">
                             {method?.details?.type} •••• {method?.details?.last4}
                           </p>
+                        </div>
+                        
                           <p className="text-sm text-muted-foreground">
                             Expires {method.details?.expiryMonth}/{method?.details?.expiryYear}
                           </p>
+                          {method.isDefault && (
+                              <span className="ml-2 inline-flex items-center text-xs font-medium text-primary">
+                                <CheckCircle className="mr-1 h-3 w-3" />
+                                Default
+                              </span>
+                            )}
                         </div>
                         {selectedPaymentMethod === method._id && <Check className="h-5 w-5 text-primary" />}
                       </div>

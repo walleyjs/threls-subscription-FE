@@ -77,7 +77,6 @@
   }
 }
 
-/* Custom utility classes using standard CSS */
 @layer components {
   .stat-card {
     display: flex;
@@ -105,7 +104,8 @@
     color: hsl(var(--primary-foreground));
   }
   .primary-button:hover {
-    background-color: hsla(var(--primary), 0.9);
+    background-color: hsla(var(--primary));
+    cursor: pointer;
   }
 
   .destructive-button {
@@ -113,7 +113,8 @@
     color: hsl(var(--destructive-foreground));
   }
   .destructive-button:hover {
-    background-color: hsla(var(--destructive), 0.9);
+    background-color: hsla(var(--destructive));
+    cursor: pointer;
   }
 
   .outline-button {
@@ -123,14 +124,17 @@
   .outline-button:hover {
     background-color: hsl(var(--accent));
     color: hsl(var(--accent-foreground));
+    cursor: pointer;
   }
 
   .secondary-button {
     background-color: hsl(var(--secondary));
     color: hsl(var(--secondary-foreground));
+
   }
   .secondary-button:hover {
-    background-color: hsla(var(--secondary), 0.8);
+    background-color: hsla(var(--secondary));
+    cursor: pointer;
   }
 
   .ghost-button {
@@ -350,5 +354,81 @@
       transform: rotate(360deg);
     }
   }
+
+  .toggle-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    height: 2.5rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    transition-property: color, background-color, border-color;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .toggle-button:hover {
+    background-color: hsl(var(--muted));
+    color: hsl(var(--muted-foreground));
+  }
+
+  .toggle-button:focus-visible {
+    outline: none;
+    ring: 2px solid hsl(var(--ring));
+    ring-offset: 2px;
+  }
+
+  .toggle-button[data-state="on"] {
+    background-color: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
+  }
+
+  .toggle-switch {
+    position: relative;
+    display: inline-flex;
+    height: 1.5rem;
+    width: 2.75rem;
+    flex-shrink: 0;
+    cursor: pointer;
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    transition-property: color, background-color, border-color;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .toggle-switch[data-state="checked"] {
+    background-color: hsl(var(--primary));
+  }
+
+  .toggle-switch[data-state="unchecked"] {
+    background-color: hsl(var(--input));
+  }
+
+  .toggle-switch-thumb {
+    pointer-events: none;
+    display: block;
+    height: 1.25rem;
+    width: 1.25rem;
+    border-radius: 9999px;
+    background-color: hsl(var(--background));
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    transition-property: transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .toggle-switch[data-state="checked"] .toggle-switch-thumb {
+    transform: translateX(1.25rem);
+  }
+
+  .toggle-switch[data-state="unchecked"] .toggle-switch-thumb {
+    transform: translateX(0);
+  }
+
+
 }
 
