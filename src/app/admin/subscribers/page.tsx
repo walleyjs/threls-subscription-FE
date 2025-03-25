@@ -10,6 +10,7 @@ import { Search, AlertCircle, CheckCircle } from "lucide-react"
 import { formatDate } from "@/lib/utils"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useRouter } from "next/navigation"
 
 export default function AdminSubscribersPage() {
   const [subscribers, setSubscribers] = useState<any[]>([])
@@ -18,6 +19,7 @@ export default function AdminSubscribersPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const { toast } = useToast()
+  const router = useRouter()
 
   useEffect(() => {
     fetchSubscribers()
@@ -47,18 +49,18 @@ export default function AdminSubscribersPage() {
   const filterSubscribers = () => {
     let filtered = [...subscribers]
 
-    // Apply search filter
+
     if (searchQuery) {
       filtered = filtered.filter(
         (subscriber) =>
-          subscriber.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          subscriber.name.toLowerCase().includes(searchQuery.toLowerCase()),
+         subscriber.userId.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          subscriber.userId.FirstName.toLowerCase().includes(searchQuery.toLowerCase()),
       )
     }
 
-    // Apply status filter
+
     if (statusFilter !== "all") {
-      filtered = filtered.filter((subscriber) => subscriber.subscription.status === statusFilter)
+      filtered = filtered.filter((subscriber) => subscriber.status === statusFilter)
     }
 
     setFilteredSubscribers(filtered)
@@ -127,12 +129,12 @@ export default function AdminSubscribersPage() {
                 {filteredSubscribers.length > 0 ? (
                   filteredSubscribers.map((subscriber) => (
                     <TableRow key={subscriber._id}>
-                      <TableCell className="font-medium">{subscriber.name}</TableCell>
-                      <TableCell>{subscriber.email}</TableCell>
-                      <TableCell>{subscriber.subscription.plan.name}</TableCell>
+                      <TableCell className="font-medium">{subscriber?.userId?.firstName} {subscriber?.userId?.lastName}</TableCell>
+                      <TableCell>{subscriber?.userId?.email}</TableCell>
+                      <TableCell>{subscriber.planId.name}</TableCell>
                       <TableCell>
                         <div className="status-indicator">
-                          {subscriber.subscription.status === "active" ? (
+                          {subscriber.status === "active" ? (
                             <>
                               <CheckCircle className="mr-2 h-4 w-4 status-indicator-active" />
                               <span className="font-medium status-indicator-active">Active</span>
@@ -141,17 +143,19 @@ export default function AdminSubscribersPage() {
                             <>
                               <AlertCircle className="mr-2 h-4 w-4 status-indicator-inactive" />
                               <span className="font-medium status-indicator-inactive">
-                                {subscriber.subscription.status.charAt(0).toUpperCase() +
-                                  subscriber.subscription.status.slice(1)}
+                                {subscriber.status.charAt(0).toUpperCase() +
+                                  subscriber.status.slice(1)}
                               </span>
                             </>
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>{formatDate(subscriber.subscription.createdAt)}</TableCell>
-                      <TableCell>{formatDate(subscriber.subscription.nextBillingDate)}</TableCell>
+                      <TableCell>{formatDate(subscriber.createdAt)}</TableCell>
+                      <TableCell>{formatDate(subscriber.currentPeriodEnd)}</TableCell>
                       <TableCell>
-                        <Button variant="outline" size="sm">
+                        <Button  variant="outline"
+                          size="sm"
+                          onClick={() => router.push(`/admin/subscribers/${subscriber._id}`)}>
                           View Details
                         </Button>
                       </TableCell>

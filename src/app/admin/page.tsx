@@ -12,6 +12,8 @@ export default function AdminDashboardPage() {
     activeSubscribers: 0,
     totalRevenue: 0,
     subscriptionPlans: 0,
+    pastDueSubscribers:0,
+    trialSubscribers:0
   })
   const [isLoading, setIsLoading] = useState(true)
   const { toast } = useToast()
@@ -72,6 +74,35 @@ export default function AdminDashboardPage() {
               <div className="stat-content">
                 <p className="stat-label">Active Subscribers</p>
                 <h3 className="stat-value">{stats?.activeSubscribers}</h3>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="stat-card">
+              <div className="stat-icon">
+                <Users className="h-5 w-5" />
+              </div>
+              <div className="stat-content">
+                <p className="stat-label">Inactive Subscribers</p>
+                <h3 className="stat-value">{stats?.pastDueSubscribers}</h3>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="stat-card">
+              <div className="stat-icon">
+                <Users className="h-5 w-5" />
+              </div>
+              <div className="stat-content">
+                <p className="stat-label">Trial Subscribers</p>
+                <h3 className="stat-value">{stats?.trialSubscribers}</h3>
               </div>
             </div>
           </CardContent>

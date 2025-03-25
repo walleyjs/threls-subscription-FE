@@ -7,14 +7,14 @@ type ApiResponse<T> = {
 };
 
 class ApiService {
-  private baseUrl = config.api.baseUrl;
-  private accessToken: string | null = null;
+  private baseUrl = config.api.baseUrl
+  private accessToken: string | null = null
 
   constructor() {
     if (typeof window !== "undefined") {
-      const tokens = localStorage.getItem(config.auth.tokenStorageKey);
+      const tokens = localStorage.getItem(config.auth.tokenStorageKey)
       if (tokens) {
-        this.accessToken = JSON.parse(tokens).accessToken;
+        this.accessToken = JSON.parse(tokens).accessToken
       }
     }
   }
@@ -22,13 +22,22 @@ class ApiService {
   private getHeaders(): HeadersInit {
     const headers: HeadersInit = {
       "Content-Type": "application/json",
-    };
-
-    if (this.accessToken) {
-      headers["Authorization"] = `Bearer ${this.accessToken}`;
     }
 
-    return headers;
+    // Always get the latest token from localStorage
+    if (typeof window !== "undefined") {
+      const tokens = localStorage.getItem(config.auth.tokenStorageKey)
+      if (tokens) {
+        try {
+          const parsedTokens = JSON.parse(tokens)
+          headers["Authorization"] = `Bearer ${parsedTokens.accessToken}`
+        } catch (error) {
+          console.error("Error parsing tokens from localStorage:", error)
+        }
+      }
+    }
+
+    return headers
   }
 
   private async handleResponse<T>(response: Response): Promise<T> {
@@ -55,6 +64,14 @@ class ApiService {
     });
 
     return this.handleResponse<any>(response);
+  }
+
+  async getSubscriberDetails(subscriberId: string): Promise<any> {
+    const response = await fetch(`${this.baseUrl}/admin/subscribers/${subscriberId}`, {
+      headers: this.getHeaders(),
+    })
+
+    return this.handleResponse<any>(response)
   }
 
   async cancelSubscription(subscriptionId: string): Promise<any> {
@@ -233,6 +250,41 @@ class ApiService {
     return this.handleResponse<any>(response)
   }
 
+  async getAdminTransactions(filters = {}) {
+    const queryParams = new URLSearchParams()
+
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        queryParams.append(key, String(value))
+      }
+    })
+
+    const queryString = queryParams.toString()
+    const url = `${this.baseUrl}/admin/transactions${queryString ? `?${queryString}` : ""}`
+
+    const response = await fetch(url, {
+      headers: this.getHeaders(),
+    })
+
+    return this.handleResponse<any>(response)
+  }
+
+  async getAdminTransaction(id: string) {
+    const response = await fetch(`${this.baseUrl}/admin/transactions/${id}`, {
+      headers: this.getHeaders(),
+    })
+
+    return this.handleResponse<any>(response)
+  }
+
+  async logout(): Promise<any> {
+    const response = await fetch(`${this.baseUrl}/logout`, {
+      method: "DELETE",
+      headers: this.getHeaders(),
+    })
+
+    return this.handleResponse<any>(response)
+  }
 }
 
 export const apiService = new ApiService();

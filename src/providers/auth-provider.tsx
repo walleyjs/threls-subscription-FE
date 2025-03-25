@@ -6,6 +6,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/components/ui/use-toast"
 import { config } from "@/config"
+import { apiService } from "@/services/api-service"
 
 type User = {
   _id: string
@@ -71,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(user)
       setTokens(tokens)
 
-      // Save to localStorage
+
       localStorage.setItem(config.auth.userStorageKey, JSON.stringify(user))
       localStorage.setItem(config.auth.tokenStorageKey, JSON.stringify(tokens))
 
@@ -135,11 +136,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const logout = () => {
+  const logout = async() => {
+    await apiService.logout()
     setUser(null)
     setTokens(null)
     localStorage.removeItem(config.auth.userStorageKey)
     localStorage.removeItem(config.auth.tokenStorageKey)
+  
     router.push("/login")
   }
 
