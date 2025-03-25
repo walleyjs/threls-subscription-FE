@@ -2,6 +2,16 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+## How to build and run this project
+
+ * Installation flow
+    * From the root of the project executes in terminal `npm install`.
+    * Use the latest version of node on the local machine if the build fails.
+    * Make a copy of **.env.example** file to **.env**.
+    * Execute `npm dev` to run the development server
+    
+
+
 First, run the development server:
 
 ```bash
