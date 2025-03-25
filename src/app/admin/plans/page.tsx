@@ -1,71 +1,81 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useEffect, useState } from "react"
-import { apiService } from "@/services/api-service"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useToast } from "@/components/ui/use-toast"
-import { Edit, Trash2, Plus, Check } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { FeatureManagement } from "@/components/feature-management"
+import { useEffect, useState } from "react";
+import { apiService } from "@/services/api-service";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/components/ui/use-toast";
+import { Edit, Trash2, Plus, Check } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { FeatureManagement } from "@/components/feature-management";
 
 export default function AdminPlansPage() {
-  const [plans, setPlans] = useState<any>({ monthly: [], yearly: [] })
-  const [isLoading, setIsLoading] = useState(true)
-  const [isCreatingPlan, setIsCreatingPlan] = useState(false)
-  const { toast } = useToast()
+  const [plans, setPlans] = useState<any>({ monthly: [], yearly: [] });
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCreatingPlan, setIsCreatingPlan] = useState(false);
+  const { toast } = useToast();
 
-  // Form state
-  const [planName, setPlanName] = useState("")
-  const [planDescription, setPlanDescription] = useState("")
-  const [planPrice, setPlanPrice] = useState("")
-  const [planCurrency, setPlanCurrency] = useState("USD")
-  const [planBillingCycle, setPlanBillingCycle] = useState("monthly")
-  const [trialPeriodDays, setTrialPeriodDays] = useState("0")
-  const [displayOrder, setDisplayOrder] = useState("0")
-  const [planFeatures, setPlanFeatures] = useState<any[]>([])
-  const [isDeleting, setIsDeleting] = useState<string | null>(null)
-  const [isEditingPlan, setIsEditingPlan] = useState(false)
-  const [currentPlan, setCurrentPlan] = useState<any>(null)
+  const [planName, setPlanName] = useState("");
+  const [planDescription, setPlanDescription] = useState("");
+  const [planPrice, setPlanPrice] = useState("");
+  const [planCurrency, setPlanCurrency] = useState("USD");
+  const [planBillingCycle, setPlanBillingCycle] = useState("monthly");
+  const [trialPeriodDays, setTrialPeriodDays] = useState("0");
+  const [displayOrder, setDisplayOrder] = useState("0");
+  const [planFeatures, setPlanFeatures] = useState<any[]>([]);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [isEditingPlan, setIsEditingPlan] = useState(false);
+  const [currentPlan, setCurrentPlan] = useState<any>(null);
 
   useEffect(() => {
-    fetchPlans()
-  }, [])
+    fetchPlans();
+  }, []);
 
   const fetchPlans = async () => {
     try {
-      setIsLoading(true)
-      const plansData = await apiService.getPlans()
-      setPlans(plansData.data)
+      setIsLoading(true);
+      const plansData = await apiService.getPlans();
+      setPlans(plansData.data);
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to load plans. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleAddPlan = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
-      // Validate form
       if (!planName || !planDescription || !planPrice) {
         toast({
           title: "Validation Error",
           description: "Please fill in all required fields",
           variant: "destructive",
-        })
-        return
+        });
+        return;
       }
 
       const planData = {
@@ -81,146 +91,149 @@ export default function AdminPlansPage() {
           featureId: feature.featureId,
           limitValue: feature.limitValue,
         })),
-      }
+      };
 
-      await apiService.createPlan(planData)
+      await apiService.createPlan(planData);
 
       toast({
         title: "Success",
         description: "Plan created successfully",
-      })
+      });
 
-      setIsCreatingPlan(false)
-      resetForm()
-      fetchPlans()
+      setIsCreatingPlan(false);
+      resetForm();
+      fetchPlans();
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to create plan. Please try again.",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const handleUpdatePlan = async (e: React.FormEvent) => {
-         e.preventDefault()
-     
-         try {
-           if (!planName || !planDescription || !planPrice) {
-             toast({
-               title: "Validation Error",
-               description: "Please fill in all required fields",
-               variant: "destructive",
-             })
-             return
-           }
-     
-           const planData = {
-             name: planName,
-             description: planDescription,
-             price: Number.parseFloat(planPrice),
-             currency: planCurrency,
-             billingCycle: planBillingCycle,
-             trialPeriodDays: Number.parseInt(trialPeriodDays),
-             displayOrder: Number.parseInt(displayOrder),
-             isActive: true,
-             features: planFeatures.map((feature) => ({
-               featureId: feature.featureId,
-               limitValue: feature.limitValue,
-             })),
-           }
-     
-           await apiService.updatePlan(currentPlan._id, planData)
-     
-           toast({
-             title: "Success",
-             description: "Plan updated successfully",
-           })
-     
-           setIsEditingPlan(false)
-           setCurrentPlan(null)
-           resetForm()
-           fetchPlans()
-         } catch (error) {
-           toast({
-             title: "Error",
-             description: "Failed to update plan. Please try again.",
-             variant: "destructive",
-           })
-         }
-       }
+    e.preventDefault();
 
+    try {
+      if (!planName || !planDescription || !planPrice) {
+        toast({
+          title: "Validation Error",
+          description: "Please fill in all required fields",
+          variant: "destructive",
+        });
+        return;
+      }
 
-       const handleDelete = async (planId: string) => {
-         setIsDeleting(planId)
-         try {
-           await apiService.deletePlan(planId)
-           toast({
-             title: "Success",
-             description: "Plan deleted successfully",
-           })
-           fetchPlans()
-         } catch (error) {
-           toast({
-             title: "Error",
-             description: "Failed to delete plan",
-             variant: "destructive",
-           })
-         } finally {
-           setIsDeleting(null)
-         }
-       }
+      const planData = {
+        name: planName,
+        description: planDescription,
+        price: Number.parseFloat(planPrice),
+        currency: planCurrency,
+        billingCycle: planBillingCycle,
+        trialPeriodDays: Number.parseInt(trialPeriodDays),
+        displayOrder: Number.parseInt(displayOrder),
+        isActive: true,
+        features: planFeatures.map((feature) => ({
+          featureId: feature.featureId,
+          limitValue: feature.limitValue,
+        })),
+      };
+
+      await apiService.updatePlan(currentPlan._id, planData);
+
+      toast({
+        title: "Success",
+        description: "Plan updated successfully",
+      });
+
+      setIsEditingPlan(false);
+      setCurrentPlan(null);
+      resetForm();
+      fetchPlans();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update plan. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDelete = async (planId: string) => {
+    setIsDeleting(planId);
+    try {
+      await apiService.deletePlan(planId);
+      toast({
+        title: "Success",
+        description: "Plan deleted successfully",
+      });
+      fetchPlans();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete plan",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(null);
+    }
+  };
 
   const resetForm = () => {
-    setPlanName("")
-    setPlanDescription("")
-    setPlanPrice("")
-    setPlanCurrency("USD")
-    setPlanBillingCycle("monthly")
-    setTrialPeriodDays("0")
-    setDisplayOrder("0")
-    setPlanFeatures([])
-  }
-
+    setPlanName("");
+    setPlanDescription("");
+    setPlanPrice("");
+    setPlanCurrency("USD");
+    setPlanBillingCycle("monthly");
+    setTrialPeriodDays("0");
+    setDisplayOrder("0");
+    setPlanFeatures([]);
+  };
 
   const handleEditPlan = (plan: any) => {
-         setCurrentPlan(plan)
-         setPlanName(plan.name)
-         setPlanDescription(plan.description)
-         setPlanPrice(plan.price.toString())
-         setPlanCurrency(plan.currency)
-         setPlanBillingCycle(plan.billingCycle)
-         setTrialPeriodDays(plan.trialPeriodDays.toString())
-         setDisplayOrder(plan.displayOrder.toString())
-         setPlanFeatures(
-           plan.features.map((feature: any) => ({
-             featureId: feature.featureId || feature._id,
-             limitValue: feature.limitValue,
-           })),
-         )
-         setIsEditingPlan(true)
-       }
+    setCurrentPlan(plan);
+    setPlanName(plan.name);
+    setPlanDescription(plan.description);
+    setPlanPrice(plan.price.toString());
+    setPlanCurrency(plan.currency);
+    setPlanBillingCycle(plan.billingCycle);
+    setTrialPeriodDays(plan.trialPeriodDays.toString());
+    setDisplayOrder(plan.displayOrder.toString());
+    setPlanFeatures(
+      plan.features.map((feature: any) => ({
+        featureId: feature.featureId || feature._id,
+        limitValue: feature.limitValue,
+      }))
+    );
+    setIsEditingPlan(true);
+  };
 
   if (isLoading) {
     return (
       <div className="loading-container">
         <div className="loading-spinner"></div>
       </div>
-    )
+    );
   }
 
   if (isCreatingPlan || isEditingPlan) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold"> {isEditingPlan ? "Edit Subscription Plan" : "Create Subscription Plan"}</h1>
+          <h1 className="text-3xl font-bold">
+            {" "}
+            {isEditingPlan
+              ? "Edit Subscription Plan"
+              : "Create Subscription Plan"}
+          </h1>
           <Button
             variant="outline"
             onClick={() => {
-              setIsCreatingPlan(false)
-              setIsEditingPlan(false)
-              setCurrentPlan(null)
-              resetForm()
+              setIsCreatingPlan(false);
+              setIsEditingPlan(false);
+              setCurrentPlan(null);
+              resetForm();
             }}
           >
             Cancel
@@ -283,7 +296,10 @@ export default function AdminPlansPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="planBillingCycle">Billing Cycle</Label>
-                <Select value={planBillingCycle} onValueChange={setPlanBillingCycle}>
+                <Select
+                  value={planBillingCycle}
+                  onValueChange={setPlanBillingCycle}
+                >
                   <SelectTrigger id="planBillingCycle">
                     <SelectValue placeholder="Select cycle" />
                   </SelectTrigger>
@@ -319,17 +335,20 @@ export default function AdminPlansPage() {
               </div>
             </div>
 
-            <FeatureManagement selectedFeatures={planFeatures} onFeaturesChange={setPlanFeatures} />
+            <FeatureManagement
+              selectedFeatures={planFeatures}
+              onFeaturesChange={setPlanFeatures}
+            />
 
             <div className="flex justify-end">
               <Button type="submit" size="lg">
-              {isEditingPlan ? "Update Plan" : "Create Plan"}
+                {isEditingPlan ? "Update Plan" : "Create Plan"}
               </Button>
             </div>
           </div>
         </form>
       </div>
-    )
+    );
   }
 
   return (
@@ -358,11 +377,16 @@ export default function AdminPlansPage() {
                 <CardContent className="space-y-4">
                   <div className="text-center">
                     <span className="text-3xl font-bold">${plan.price}</span>
-                    <span className="text-sm text-muted-foreground"> / month</span>
+                    <span className="text-sm text-muted-foreground">
+                      {" "}
+                      / month
+                    </span>
                   </div>
 
                   {plan.trialPeriodDays > 0 && (
-                    <p className="text-center text-sm text-muted-foreground">{plan.trialPeriodDays} days free trial</p>
+                    <p className="text-center text-sm text-muted-foreground">
+                      {plan.trialPeriodDays} days free trial
+                    </p>
                   )}
 
                   {plan.features && plan.features.length > 0 && (
@@ -373,7 +397,8 @@ export default function AdminPlansPage() {
                           <Check className="mr-2 h-4 w-4 text-green-500" />
                           <span className="text-sm">
                             {feature.name}
-                            {feature.limitType !== "boolean" && `: ${feature.value}`}
+                            {feature.limitType !== "boolean" &&
+                              `: ${feature.value}`}
                           </span>
                         </div>
                       ))}
@@ -381,11 +406,21 @@ export default function AdminPlansPage() {
                   )}
 
                   <div className="flex justify-end space-x-2">
-                  <Button variant="outline" size="sm" onClick={() => handleEditPlan(plan)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditPlan(plan)}
+                    >
                       <Edit className="mr-2 h-4 w-4" /> Edit
                     </Button>
-                    <Button onClick={() => handleDelete(plan._id)} variant="outline" size="sm" className="text-destructive hover:text-destructive">
-                      <Trash2 className="mr-2 h-4 w-4" />   {isDeleting === plan._id ? "Deleting..." : "Delete"}
+                    <Button
+                      onClick={() => handleDelete(plan._id)}
+                      variant="outline"
+                      size="sm"
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />{" "}
+                      {isDeleting === plan._id ? "Deleting..." : "Delete"}
                     </Button>
                   </div>
                 </CardContent>
@@ -405,11 +440,16 @@ export default function AdminPlansPage() {
                 <CardContent className="space-y-4">
                   <div className="text-center">
                     <span className="text-3xl font-bold">${plan.price}</span>
-                    <span className="text-sm text-muted-foreground"> / year</span>
+                    <span className="text-sm text-muted-foreground">
+                      {" "}
+                      / year
+                    </span>
                   </div>
 
                   {plan.trialPeriodDays > 0 && (
-                    <p className="text-center text-sm text-muted-foreground">{plan.trialPeriodDays} days free trial</p>
+                    <p className="text-center text-sm text-muted-foreground">
+                      {plan.trialPeriodDays} days free trial
+                    </p>
                   )}
 
                   {plan.features && plan.features.length > 0 && (
@@ -420,7 +460,8 @@ export default function AdminPlansPage() {
                           <Check className="mr-2 h-4 w-4 text-green-500" />
                           <span className="text-sm">
                             {feature.name}
-                            {feature.limitType !== "boolean" && `: ${feature.value}`}
+                            {feature.limitType !== "boolean" &&
+                              `: ${feature.value}`}
                           </span>
                         </div>
                       ))}
@@ -428,11 +469,21 @@ export default function AdminPlansPage() {
                   )}
 
                   <div className="flex justify-end space-x-2">
-                  <Button variant="outline" size="sm" onClick={() => handleEditPlan(plan)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditPlan(plan)}
+                    >
                       <Edit className="mr-2 h-4 w-4" /> Edit
                     </Button>
-                    <Button onClick={() => handleDelete(plan._id)} variant="outline" size="sm" className="text-destructive hover:text-destructive">
-                      <Trash2 className="mr-2 h-4 w-4" />   {isDeleting === plan._id ? "Deleting..." : "Delete"}
+                    <Button
+                      onClick={() => handleDelete(plan._id)}
+                      variant="outline"
+                      size="sm"
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />{" "}
+                      {isDeleting === plan._id ? "Deleting..." : "Delete"}
                     </Button>
                   </div>
                 </CardContent>
@@ -442,6 +493,5 @@ export default function AdminPlansPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
-

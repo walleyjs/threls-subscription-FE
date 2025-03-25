@@ -36,7 +36,6 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch subscription data
         try {
           const data = await apiService.getSubscription();
           setSubscription(data.data);
@@ -44,7 +43,6 @@ export default function DashboardPage() {
           console.log("No active subscription found");
         }
 
-        // Fetch transaction data
         try {
           setIsTransactionsLoading(true);
           const transactionsData = await apiService.getTransactions();
@@ -73,7 +71,6 @@ export default function DashboardPage() {
     try {
       await apiService.cancelSubscription(subscription._id);
 
-      // Update the local state
       setSubscription({
         ...subscription,
         cancellationRequested: true,
@@ -93,20 +90,20 @@ export default function DashboardPage() {
   };
 
   const handleViewInvoice = async (invoiceId: string) => {
-         setIsInvoiceLoading(true)
-         try {
-           const invoice = await apiService.getInvoice(invoiceId)
-           setSelectedInvoice(invoice.data)
-         } catch (error) {
-           toast({
-             title: "Error",
-             description: "Failed to load invoice details. Please try again.",
-             variant: "destructive",
-           })
-         } finally {
-           setIsInvoiceLoading(false)
-         }
-       }
+    setIsInvoiceLoading(true);
+    try {
+      const invoice = await apiService.getInvoice(invoiceId);
+      setSelectedInvoice(invoice.data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load invoice details. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsInvoiceLoading(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -117,8 +114,13 @@ export default function DashboardPage() {
   }
 
   if (selectedInvoice) {
-         return <InvoiceDetails invoice={selectedInvoice} onBack={() => setSelectedInvoice(null)} />
-       }
+    return (
+      <InvoiceDetails
+        invoice={selectedInvoice}
+        onBack={() => setSelectedInvoice(null)}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -238,8 +240,7 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      
-        <div className="mt-8">
+      <div className="mt-8">
         <h2 className="mb-4 text-2xl font-bold">Transaction History</h2>
         <Card>
           <CardHeader>
@@ -267,10 +268,19 @@ export default function DashboardPage() {
                   <TableBody>
                     {transactions.map((transaction) => (
                       <TableRow key={transaction._id}>
-                        <TableCell className="font-medium">{transaction.invoiceNumber}</TableCell>
-                        <TableCell>{formatDate(transaction.createdAt)}</TableCell>
+                        <TableCell className="font-medium">
+                          {transaction.invoiceNumber}
+                        </TableCell>
+                        <TableCell>
+                          {formatDate(transaction.createdAt)}
+                        </TableCell>
                         <TableCell>{transaction.failureReason}</TableCell>
-                        <TableCell>{formatCurrency(transaction.amount, transaction.currency)}</TableCell>
+                        <TableCell>
+                          {formatCurrency(
+                            transaction.amount,
+                            transaction.currency
+                          )}
+                        </TableCell>
                         <TableCell>
                           <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize bg-green-100 text-green-800">
                             {transaction.status}

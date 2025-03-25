@@ -1,53 +1,58 @@
-"use client"
+"use client";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Check, X } from "lucide-react"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Check, X } from "lucide-react";
 
 interface Plan {
-  _id: string
-  name: string
-  price: number
-  features: any[]
+  _id: string;
+  name: string;
+  price: number;
+  features: any[];
 }
 
 interface PlanComparisonProps {
-  plans: Plan[]
-  currentPlanId?: string | null
+  plans: Plan[];
+  currentPlanId?: string | null;
 }
 
 export function PlanComparison({ plans, currentPlanId }: PlanComparisonProps) {
-  // Get all unique features across all plans
   const allFeatures = plans.reduce((acc: any[], plan) => {
     plan.features.forEach((feature) => {
       if (!acc.some((f) => f.id === feature.id)) {
-        acc.push(feature)
+        acc.push(feature);
       }
-    })
-    return acc
-  }, [])
+    });
+    return acc;
+  }, []);
 
-  // Sort features by display order if available
   allFeatures.sort((a, b) => {
     if (a.displayOrder !== undefined && b.displayOrder !== undefined) {
-      return a.displayOrder - b.displayOrder
+      return a.displayOrder - b.displayOrder;
     }
-    return 0
-  })
+    return 0;
+  });
 
   const getFeatureValue = (plan: Plan, featureId: string) => {
-    const feature = plan.features.find((f) => f.id === featureId)
-    if (!feature) return null
+    const feature = plan.features.find((f) => f.id === featureId);
+    if (!feature) return null;
 
     if (typeof feature.value === "boolean") {
       return feature.value ? (
         <Check className="h-4 w-4 text-green-500 mx-auto" />
       ) : (
         <X className="h-4 w-4 text-red-500 mx-auto" />
-      )
+      );
     }
 
-    return feature.value
-  }
+    return feature.value;
+  };
 
   return (
     <div className="overflow-x-auto">
@@ -58,7 +63,9 @@ export function PlanComparison({ plans, currentPlanId }: PlanComparisonProps) {
             {plans.map((plan) => (
               <TableHead key={plan._id} className="text-center">
                 {plan.name}
-                {currentPlanId === plan._id && <span className="ml-2 text-xs text-green-600">(Current)</span>}
+                {currentPlanId === plan._id && (
+                  <span className="ml-2 text-xs text-green-600">(Current)</span>
+                )}
               </TableHead>
             ))}
           </TableRow>
@@ -85,6 +92,5 @@ export function PlanComparison({ plans, currentPlanId }: PlanComparisonProps) {
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }
-

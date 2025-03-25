@@ -1,20 +1,14 @@
 import { config } from "@/config";
 
-type ApiResponse<T> = {
-  statusCode: string;
-  message: string;
-  data: T;
-};
-
 class ApiService {
-  private baseUrl = config.api.baseUrl
-  private accessToken: string | null = null
+  private baseUrl = config.api.baseUrl;
+  private accessToken: string | null = null;
 
   constructor() {
     if (typeof window !== "undefined") {
-      const tokens = localStorage.getItem(config.auth.tokenStorageKey)
+      const tokens = localStorage.getItem(config.auth.tokenStorageKey);
       if (tokens) {
-        this.accessToken = JSON.parse(tokens).accessToken
+        this.accessToken = JSON.parse(tokens).accessToken;
       }
     }
   }
@@ -22,22 +16,21 @@ class ApiService {
   private getHeaders(): HeadersInit {
     const headers: HeadersInit = {
       "Content-Type": "application/json",
-    }
-
+    };
 
     if (typeof window !== "undefined") {
-      const tokens = localStorage.getItem(config.auth.tokenStorageKey)
+      const tokens = localStorage.getItem(config.auth.tokenStorageKey);
       if (tokens) {
         try {
-          const parsedTokens = JSON.parse(tokens)
-          headers["Authorization"] = `Bearer ${parsedTokens.accessToken}`
+          const parsedTokens = JSON.parse(tokens);
+          headers["Authorization"] = `Bearer ${parsedTokens.accessToken}`;
         } catch (error) {
-          console.error("Error parsing tokens from localStorage:", error)
+          console.error("Error parsing tokens from localStorage:", error);
         }
       }
     }
 
-    return headers
+    return headers;
   }
 
   private async handleResponse<T>(response: Response): Promise<T> {
@@ -67,11 +60,14 @@ class ApiService {
   }
 
   async getSubscriberDetails(subscriberId: string): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/admin/subscribers/${subscriberId}`, {
-      headers: this.getHeaders(),
-    })
+    const response = await fetch(
+      `${this.baseUrl}/admin/subscribers/${subscriberId}`,
+      {
+        headers: this.getHeaders(),
+      }
+    );
 
-    return this.handleResponse<any>(response)
+    return this.handleResponse<any>(response);
   }
 
   async cancelSubscription(subscriptionId: string): Promise<any> {
@@ -126,36 +122,39 @@ class ApiService {
   }
 
   async setDefaultPaymentMethod(paymentMethodId: string): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/payment-method/update/${paymentMethodId}`, {
-      method: "PUT",
-      headers: this.getHeaders(),
-    })
+    const response = await fetch(
+      `${this.baseUrl}/payment-method/update/${paymentMethodId}`,
+      {
+        method: "PUT",
+        headers: this.getHeaders(),
+      }
+    );
 
-    return this.handleResponse<any>(response)
+    return this.handleResponse<any>(response);
   }
 
   async getTransactions(): Promise<any> {
     const response = await fetch(`${this.baseUrl}/transaction`, {
       headers: this.getHeaders(),
-    })
+    });
 
-    return this.handleResponse<any>(response)
+    return this.handleResponse<any>(response);
   }
 
   async getInvoice(invoiceId: string): Promise<any> {
     const response = await fetch(`${this.baseUrl}/transaction/${invoiceId}`, {
       headers: this.getHeaders(),
-    })
+    });
 
-    return this.handleResponse<any>(response)
+    return this.handleResponse<any>(response);
   }
 
   async getAdminDashboardStats(): Promise<any> {
     const response = await fetch(`${this.baseUrl}/admin/stats`, {
       headers: this.getHeaders(),
-    })
+    });
 
-    return this.handleResponse<any>(response)
+    return this.handleResponse<any>(response);
   }
 
   async createPlan(planData: any): Promise<any> {
@@ -163,36 +162,39 @@ class ApiService {
       method: "POST",
       headers: this.getHeaders(),
       body: JSON.stringify(planData),
-    })
+    });
 
-    return this.handleResponse<any>(response)
+    return this.handleResponse<any>(response);
   }
 
   async updatePlan(planId: string, planData: any): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/admin/update-plan/${planId}`, {
-      method: "PUT",
-      headers: this.getHeaders(),
-      body: JSON.stringify(planData),
-    })
+    const response = await fetch(
+      `${this.baseUrl}/admin/update-plan/${planId}`,
+      {
+        method: "PUT",
+        headers: this.getHeaders(),
+        body: JSON.stringify(planData),
+      }
+    );
 
-    return this.handleResponse<any>(response)
+    return this.handleResponse<any>(response);
   }
 
   async deletePlan(id: string): Promise<any> {
     const response = await fetch(`${this.baseUrl}/admin/delete-plan/${id}`, {
       method: "PUT",
       headers: this.getHeaders(),
-    })
+    });
 
-    return this.handleResponse<any>(response)
+    return this.handleResponse<any>(response);
   }
 
   async getFeatures(): Promise<any> {
     const response = await fetch(`${this.baseUrl}/admin/features`, {
       headers: this.getHeaders(),
-    })
+    });
 
-    return this.handleResponse<any>(response)
+    return this.handleResponse<any>(response);
   }
 
   async createFeature(featureData: any): Promise<any> {
@@ -200,25 +202,25 @@ class ApiService {
       method: "POST",
       headers: this.getHeaders(),
       body: JSON.stringify(featureData),
-    })
+    });
 
-    return this.handleResponse<any>(response)
+    return this.handleResponse<any>(response);
   }
 
   async getWebhooks(): Promise<any[]> {
     const response = await fetch(`${this.baseUrl}/webhook`, {
       headers: this.getHeaders(),
-    })
+    });
 
-    return this.handleResponse<any[]>(response)
+    return this.handleResponse<any[]>(response);
   }
 
   async getWebhook(id: string): Promise<any> {
     const response = await fetch(`${this.baseUrl}/webhook/${id}`, {
       headers: this.getHeaders(),
-    })
+    });
 
-    return this.handleResponse<any>(response)
+    return this.handleResponse<any>(response);
   }
 
   async createWebhook(webhookData: any): Promise<any> {
@@ -226,9 +228,9 @@ class ApiService {
       method: "POST",
       headers: this.getHeaders(),
       body: JSON.stringify(webhookData),
-    })
+    });
 
-    return this.handleResponse<any>(response)
+    return this.handleResponse<any>(response);
   }
 
   async updateWebhook(id: string, webhookData: any): Promise<any> {
@@ -236,54 +238,56 @@ class ApiService {
       method: "PUT",
       headers: this.getHeaders(),
       body: JSON.stringify(webhookData),
-    })
+    });
 
-    return this.handleResponse<any>(response)
+    return this.handleResponse<any>(response);
   }
 
   async deleteWebhook(id: string): Promise<any> {
     const response = await fetch(`${this.baseUrl}/webhook/${id}`, {
       method: "DELETE",
       headers: this.getHeaders(),
-    })
+    });
 
-    return this.handleResponse<any>(response)
+    return this.handleResponse<any>(response);
   }
 
   async getAdminTransactions(filters = {}) {
-    const queryParams = new URLSearchParams()
+    const queryParams = new URLSearchParams();
 
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== "") {
-        queryParams.append(key, String(value))
+        queryParams.append(key, String(value));
       }
-    })
+    });
 
-    const queryString = queryParams.toString()
-    const url = `${this.baseUrl}/admin/transactions${queryString ? `?${queryString}` : ""}`
+    const queryString = queryParams.toString();
+    const url = `${this.baseUrl}/admin/transactions${
+      queryString ? `?${queryString}` : ""
+    }`;
 
     const response = await fetch(url, {
       headers: this.getHeaders(),
-    })
+    });
 
-    return this.handleResponse<any>(response)
+    return this.handleResponse<any>(response);
   }
 
   async getAdminTransaction(id: string) {
     const response = await fetch(`${this.baseUrl}/admin/transactions/${id}`, {
       headers: this.getHeaders(),
-    })
+    });
 
-    return this.handleResponse<any>(response)
+    return this.handleResponse<any>(response);
   }
 
   async logout(): Promise<any> {
     const response = await fetch(`${this.baseUrl}/logout`, {
       method: "DELETE",
       headers: this.getHeaders(),
-    })
+    });
 
-    return this.handleResponse<any>(response)
+    return this.handleResponse<any>(response);
   }
 }
 

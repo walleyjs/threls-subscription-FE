@@ -1,13 +1,19 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, X } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Plus, X } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -16,136 +22,146 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Textarea } from "@/components/ui/textarea"
-import { apiService } from "@/services/api-service"
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { apiService } from "@/services/api-service";
 
 interface Feature {
-  _id: string
-  name: string
-  description: string
-  key: string
-  category: string
-  isHighlighted: boolean
-  limitType: string
-  defaultLimitValue: any
-  displayOrder: number
-  isActive: boolean
-  isDeleted: boolean
-  createdAt: string
-  updatedAt: string
+  _id: string;
+  name: string;
+  description: string;
+  key: string;
+  category: string;
+  isHighlighted: boolean;
+  limitType: string;
+  defaultLimitValue: any;
+  displayOrder: number;
+  isActive: boolean;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface SelectedFeature {
-  featureId: string
-  limitValue: any
+  featureId: string;
+  limitValue: any;
 }
 
 interface FeatureManagementProps {
-  selectedFeatures: SelectedFeature[]
-  onFeaturesChange: (features: SelectedFeature[]) => void
+  selectedFeatures: SelectedFeature[];
+  onFeaturesChange: (features: SelectedFeature[]) => void;
 }
 
-export function FeatureManagement({ selectedFeatures, onFeaturesChange }: FeatureManagementProps) {
-  const [availableFeatures, setAvailableFeatures] = useState<Feature[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const { toast } = useToast()
+export function FeatureManagement({
+  selectedFeatures,
+  onFeaturesChange,
+}: FeatureManagementProps) {
+  const [availableFeatures, setAvailableFeatures] = useState<Feature[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { toast } = useToast();
 
-  // New feature form state
-  const [featureName, setFeatureName] = useState("")
-  const [featureDescription, setFeatureDescription] = useState("")
-  const [featureKey, setFeatureKey] = useState("")
-  const [featureCategory, setFeatureCategory] = useState("")
-  const [isHighlighted, setIsHighlighted] = useState(false)
-  const [limitType, setLimitType] = useState("boolean")
-  const [defaultLimitValue, setDefaultLimitValue] = useState<any>(false)
-  const [displayOrder, setDisplayOrder] = useState(0)
+  const [featureName, setFeatureName] = useState("");
+  const [featureDescription, setFeatureDescription] = useState("");
+  const [featureKey, setFeatureKey] = useState("");
+  const [featureCategory, setFeatureCategory] = useState("");
+  const [isHighlighted, setIsHighlighted] = useState(false);
+  const [limitType, setLimitType] = useState("boolean");
+  const [defaultLimitValue, setDefaultLimitValue] = useState<any>(false);
+  const [displayOrder, setDisplayOrder] = useState(0);
 
-  // Feature selection state
-  const [selectedFeatureId, setSelectedFeatureId] = useState<string>("")
-  const [featureLimitValue, setFeatureLimitValue] = useState<any>("")
+  const [selectedFeatureId, setSelectedFeatureId] = useState<string>("");
+  const [featureLimitValue, setFeatureLimitValue] = useState<any>("");
 
   useEffect(() => {
-    fetchFeatures()
-  }, [])
+    fetchFeatures();
+  }, []);
 
   const fetchFeatures = async () => {
     try {
-      setIsLoading(true)
-      const data = await apiService.getFeatures()
+      setIsLoading(true);
+      const data = await apiService.getFeatures();
 
-     
-        setAvailableFeatures(data.data)
-   
+      setAvailableFeatures(data.data);
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to load features",
+        description:
+          error instanceof Error ? error.message : "Failed to load features",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleAddFeature = () => {
-    if (!selectedFeatureId) return
+    if (!selectedFeatureId) return;
 
-    const feature = availableFeatures.find((f) => f._id === selectedFeatureId)
-    if (!feature) return
+    const feature = availableFeatures.find((f) => f._id === selectedFeatureId);
+    if (!feature) return;
 
-    // Determine the value based on the feature type
-    let limitValue: any = featureLimitValue
-    if (feature.limitType === "boolean" && typeof featureLimitValue !== "boolean") {
-      limitValue = featureLimitValue === "true"
-    } else if (feature.limitType === "number" && typeof featureLimitValue !== "number") {
-      limitValue = Number(featureLimitValue)
+    let limitValue: any = featureLimitValue;
+    if (
+      feature.limitType === "boolean" &&
+      typeof featureLimitValue !== "boolean"
+    ) {
+      limitValue = featureLimitValue === "true";
+    } else if (
+      feature.limitType === "number" &&
+      typeof featureLimitValue !== "number"
+    ) {
+      limitValue = Number(featureLimitValue);
     }
 
-    // Check if feature already exists
-    const exists = selectedFeatures.some((f) => f.featureId === selectedFeatureId)
+    const exists = selectedFeatures.some(
+      (f) => f.featureId === selectedFeatureId
+    );
     if (exists) {
       toast({
         title: "Feature already added",
         description: "This feature is already part of the plan",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    // Add the feature
-    const newFeatures = [...selectedFeatures, { featureId: selectedFeatureId, limitValue }]
-    onFeaturesChange(newFeatures)
+    const newFeatures = [
+      ...selectedFeatures,
+      { featureId: selectedFeatureId, limitValue },
+    ];
+    onFeaturesChange(newFeatures);
 
-    // Reset selection
-    setSelectedFeatureId("")
-    setFeatureLimitValue("")
-  }
+    setSelectedFeatureId("");
+    setFeatureLimitValue("");
+  };
 
   const handleRemoveFeature = (featureId: string) => {
-    const newFeatures = selectedFeatures.filter((f) => f.featureId !== featureId)
-    onFeaturesChange(newFeatures)
-  }
+    const newFeatures = selectedFeatures.filter(
+      (f) => f.featureId !== featureId
+    );
+    onFeaturesChange(newFeatures);
+  };
 
   const handleCreateFeature = async () => {
     try {
-      // Validate inputs
       if (!featureName || !featureKey) {
         toast({
           title: "Validation Error",
           description: "Feature name and key are required",
           variant: "destructive",
-        })
-        return
+        });
+        return;
       }
 
-      // Prepare the feature data
-      let processedDefaultValue: any = defaultLimitValue
+      let processedDefaultValue: any = defaultLimitValue;
       if (limitType === "boolean" && typeof defaultLimitValue !== "boolean") {
-        processedDefaultValue = defaultLimitValue === "true"
-      } else if (limitType === "number" && typeof defaultLimitValue !== "number") {
-        processedDefaultValue = Number(defaultLimitValue)
+        processedDefaultValue = defaultLimitValue === "true";
+      } else if (
+        limitType === "number" &&
+        typeof defaultLimitValue !== "number"
+      ) {
+        processedDefaultValue = Number(defaultLimitValue);
       }
 
       const featureData = {
@@ -159,46 +175,49 @@ export function FeatureManagement({ selectedFeatures, onFeaturesChange }: Featur
         displayOrder,
         isActive: true,
         isDeleted: false,
-      }
+      };
 
-      const data = await apiService.createFeature(featureData)
-        fetchFeatures()
-        setFeatureName("")
-        setFeatureDescription("")
-        setFeatureKey("")
-        setFeatureCategory("")
-        setIsHighlighted(false)
-        setLimitType("boolean")
-        setDefaultLimitValue(false)
-        setDisplayOrder(0)
+      const data = await apiService.createFeature(featureData);
+      fetchFeatures();
+      setFeatureName("");
+      setFeatureDescription("");
+      setFeatureKey("");
+      setFeatureCategory("");
+      setIsHighlighted(false);
+      setLimitType("boolean");
+      setDefaultLimitValue(false);
+      setDisplayOrder(0);
 
-        setIsDialogOpen(false)
-    
+      setIsDialogOpen(false);
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to create feature",
+        description:
+          error instanceof Error ? error.message : "Failed to create feature",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const getFeatureById = (id: string) => {
-    return availableFeatures.find((f) => f._id === id)
-  }
+    return availableFeatures.find((f) => f._id === id);
+  };
 
   const renderFeatureValueInput = () => {
-    if (!selectedFeatureId) return null
+    if (!selectedFeatureId) return null;
 
-    const feature = availableFeatures.find((f) => f._id === selectedFeatureId)
-    if (!feature) return null
+    const feature = availableFeatures.find((f) => f._id === selectedFeatureId);
+    if (!feature) return null;
 
     switch (feature.limitType) {
       case "boolean":
         return (
           <div className="space-y-2">
             <Label htmlFor="featureLimitValue">Value</Label>
-            <Select value={String(featureLimitValue)} onValueChange={(value) => setFeatureLimitValue(value === "true")}>
+            <Select
+              value={String(featureLimitValue)}
+              onValueChange={(value) => setFeatureLimitValue(value === "true")}
+            >
               <SelectTrigger id="featureLimitValue">
                 <SelectValue placeholder="Select value" />
               </SelectTrigger>
@@ -208,7 +227,7 @@ export function FeatureManagement({ selectedFeatures, onFeaturesChange }: Featur
               </SelectContent>
             </Select>
           </div>
-        )
+        );
       case "number":
         return (
           <div className="space-y-2">
@@ -220,7 +239,7 @@ export function FeatureManagement({ selectedFeatures, onFeaturesChange }: Featur
               onChange={(e) => setFeatureLimitValue(Number(e.target.value))}
             />
           </div>
-        )
+        );
       case "string":
         return (
           <div className="space-y-2">
@@ -231,11 +250,11 @@ export function FeatureManagement({ selectedFeatures, onFeaturesChange }: Featur
               onChange={(e) => setFeatureLimitValue(e.target.value)}
             />
           </div>
-        )
+        );
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   const renderCreateFeatureForm = () => {
     return (
@@ -291,11 +310,10 @@ export function FeatureManagement({ selectedFeatures, onFeaturesChange }: Featur
             <Select
               value={limitType}
               onValueChange={(value: string) => {
-                setLimitType(value)
-                // Reset default value based on type
-                if (value === "boolean") setDefaultLimitValue(false)
-                else if (value === "number") setDefaultLimitValue(0)
-                else setDefaultLimitValue("")
+                setLimitType(value);
+                if (value === "boolean") setDefaultLimitValue(false);
+                else if (value === "number") setDefaultLimitValue(0);
+                else setDefaultLimitValue("");
               }}
             >
               <SelectTrigger id="limitType">
@@ -324,7 +342,10 @@ export function FeatureManagement({ selectedFeatures, onFeaturesChange }: Featur
         {limitType === "boolean" && (
           <div className="space-y-2">
             <Label htmlFor="defaultLimitValue">Default Value</Label>
-            <Select value={String(defaultLimitValue)} onValueChange={(value) => setDefaultLimitValue(value === "true")}>
+            <Select
+              value={String(defaultLimitValue)}
+              onValueChange={(value) => setDefaultLimitValue(value === "true")}
+            >
               <SelectTrigger id="defaultLimitValue">
                 <SelectValue placeholder="Select default value" />
               </SelectTrigger>
@@ -365,18 +386,20 @@ export function FeatureManagement({ selectedFeatures, onFeaturesChange }: Featur
             checked={isHighlighted}
             onCheckedChange={(checked) => setIsHighlighted(checked === true)}
           />
-          <Label htmlFor="isHighlighted">Highlight this feature in plan comparisons</Label>
+          <Label htmlFor="isHighlighted">
+            Highlight this feature in plan comparisons
+          </Label>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   if (isLoading) {
     return (
       <div className="flex h-24 items-center justify-center">
         <div className="loading-spinner"></div>
       </div>
-    )
+    );
   }
 
   return (
@@ -392,7 +415,9 @@ export function FeatureManagement({ selectedFeatures, onFeaturesChange }: Featur
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Create New Feature</DialogTitle>
-              <DialogDescription>Add a new feature that can be included in subscription plans.</DialogDescription>
+              <DialogDescription>
+                Add a new feature that can be included in subscription plans.
+              </DialogDescription>
             </DialogHeader>
             {renderCreateFeatureForm()}
             <DialogFooter>
@@ -408,18 +433,23 @@ export function FeatureManagement({ selectedFeatures, onFeaturesChange }: Featur
       <div className="rounded-md border">
         <div className="p-6">
           <h3 className="text-lg font-medium">Selected Features</h3>
-          <p className="text-sm text-muted-foreground">Features included in this plan</p>
+          <p className="text-sm text-muted-foreground">
+            Features included in this plan
+          </p>
         </div>
 
         <div className="p-6 pt-0">
           {selectedFeatures.length > 0 ? (
             <div className="space-y-2">
               {selectedFeatures.map((feature) => {
-                const featureDetails = getFeatureById(feature.featureId)
-                if (!featureDetails) return null
+                const featureDetails = getFeatureById(feature.featureId);
+                if (!featureDetails) return null;
 
                 return (
-                  <div key={feature.featureId} className="flex items-center justify-between rounded-md border p-3">
+                  <div
+                    key={feature.featureId}
+                    className="flex items-center justify-between rounded-md border p-3"
+                  >
                     <div>
                       <p className="font-medium">{featureDetails.name}</p>
                       <p className="text-sm text-muted-foreground">
@@ -430,15 +460,21 @@ export function FeatureManagement({ selectedFeatures, onFeaturesChange }: Featur
                           : `Limit: ${feature.limitValue}`}
                       </p>
                     </div>
-                    <Button variant="ghost" size="sm" onClick={() => handleRemoveFeature(feature.featureId)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveFeature(feature.featureId)}
+                    >
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
-                )
+                );
               })}
             </div>
           ) : (
-            <p className="text-center py-8 text-muted-foreground">No features added to this plan yet.</p>
+            <p className="text-center py-8 text-muted-foreground">
+              No features added to this plan yet.
+            </p>
           )}
         </div>
 
@@ -446,7 +482,10 @@ export function FeatureManagement({ selectedFeatures, onFeaturesChange }: Featur
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="featureSelect">Add Feature</Label>
-              <Select value={selectedFeatureId} onValueChange={setSelectedFeatureId}>
+              <Select
+                value={selectedFeatureId}
+                onValueChange={setSelectedFeatureId}
+              >
                 <SelectTrigger id="featureSelect">
                   <SelectValue placeholder="Select a feature" />
                 </SelectTrigger>
@@ -473,6 +512,5 @@ export function FeatureManagement({ selectedFeatures, onFeaturesChange }: Featur
         </div>
       </div>
     </div>
-  )
+  );
 }
-
