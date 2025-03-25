@@ -24,7 +24,7 @@ class ApiService {
       "Content-Type": "application/json",
     }
 
-    // Always get the latest token from localStorage
+
     if (typeof window !== "undefined") {
       const tokens = localStorage.getItem(config.auth.tokenStorageKey)
       if (tokens) {

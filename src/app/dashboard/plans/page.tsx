@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
 import { Check, CheckCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { PlanComparison } from "@/components/plan-comparison"
 
 export default function PlansPage() {
   const [plans, setPlans] = useState<any>({ monthly: [], yearly: [] })
@@ -15,14 +16,33 @@ export default function PlansPage() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
   const [paymentMethods, setPaymentMethods] = useState<any[]>([])
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null)
+  const [currentPlan, setCurrentPlan] = useState<string | null>(null)
+  const [defaultTab, setDefaultTab] = useState("monthly")
+  const [activeTab, setActiveTab] = useState(defaultTab)
   const { toast } = useToast()
   const router = useRouter()
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const plansData = await apiService.getPlans()
         setPlans(plansData?.data)
+
+        try {
+         const subscription = await apiService.getSubscription()
+         if (subscription.data && subscription.data.planId) {
+           setCurrentPlan(subscription?.data.planId._id)
+
+          
+           if (subscription.data.planId?.billingCycle === "yearly") {
+             setDefaultTab("yearly")
+           }
+         }
+       } catch (error) {
+        
+         console.log("No active subscription found")
+       }
 
         const paymentMethodsData = await apiService.getPaymentMethods()
         setPaymentMethods(paymentMethodsData?.data)
@@ -55,6 +75,15 @@ export default function PlansPage() {
       return
     }
 
+
+    if (currentPlan === selectedPlan) {
+         toast({
+           title: "Info",
+           description: "You are already subscribed to this plan",
+         })
+         return
+       }
+
     try {
       await apiService.createSubscription(selectedPlan, selectedPaymentMethod)
 
@@ -85,7 +114,7 @@ export default function PlansPage() {
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Subscription Plans</h1>
 
-      <Tabs defaultValue="monthly" className="w-full">
+      <Tabs defaultValue={defaultTab} className="w-full" onValueChange={(value) => setActiveTab(value)}>
         <TabsList className="grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="monthly">Monthly</TabsTrigger>
           <TabsTrigger value="yearly">Yearly</TabsTrigger>
@@ -94,8 +123,12 @@ export default function PlansPage() {
         <TabsContent value="monthly" className="mt-6">
           <div className="grid gap-6 md:grid-cols-3">
             {plans.monthly.map((plan: any) => (
-              <Card key={plan._id} className={`subscription-card ${selectedPlan === plan._id ? "selected" : ""}`}>
+             <Card
+                key={plan._id}
+                className={`subscription-card ${selectedPlan === plan._id ? "selected" : ""} ${currentPlan === plan._id ? "border-2 border-primary bg-primary/5" : ""}`}
+              >
                 {selectedPlan === plan._id && <div className="subscription-badge">Selected</div>}
+                {currentPlan === plan._id && <div className="subscription-badge bg-green-600">Current Plan</div>}
                 <CardHeader>
                   <CardTitle>{plan.name}</CardTitle>
                   <CardDescription>{plan.description}</CardDescription>
@@ -126,9 +159,10 @@ export default function PlansPage() {
                   <Button
                     className="w-full"
                     onClick={() => setSelectedPlan(plan._id)}
-                    variant={selectedPlan === plan._id ? "default" : "outline"}
+                    variant={selectedPlan === plan._id ? "default" : currentPlan === plan._id ? "secondary" : "outline"}
+                    disabled={currentPlan === plan._id}
                   >
-                    {selectedPlan === plan._id ? "Selected" : "Select Plan"}
+                   {currentPlan === plan._id ? "Current Plan" : selectedPlan === plan._id ? "Selected" : "Select Plan"}
                   </Button>
                 </CardFooter>
               </Card>
@@ -139,8 +173,12 @@ export default function PlansPage() {
         <TabsContent value="yearly" className="mt-6">
           <div className="grid gap-6 md:grid-cols-3">
             {plans.yearly.map((plan: any) => (
-              <Card key={plan._id} className={`subscription-card ${selectedPlan === plan._id ? "selected" : ""}`}>
-                {selectedPlan === plan._id && <div className="subscription-badge">Selected</div>}
+              <Card
+              key={plan._id}
+              className={`subscription-card ${selectedPlan === plan._id ? "selected" : ""} ${currentPlan === plan._id ? "border-2 border-primary bg-primary/5" : ""}`}
+            >
+              {selectedPlan === plan._id && <div className="subscription-badge">Selected</div>}
+              {currentPlan === plan._id && <div className="subscription-badge bg-green-600">Current Plan</div>}
                 <CardHeader>
                   <CardTitle>{plan.name}</CardTitle>
                   <CardDescription>{plan.description}</CardDescription>
@@ -171,7 +209,8 @@ export default function PlansPage() {
                   <Button
                     className="w-full"
                     onClick={() => setSelectedPlan(plan._id)}
-                    variant={selectedPlan === plan._id ? "default" : "outline"}
+                    variant={selectedPlan === plan._id ? "default" : currentPlan === plan._id ? "secondary" : "outline"}
+                    disabled={currentPlan === plan._id}
                   >
                     {selectedPlan === plan._id ? "Selected" : "Select Plan"}
                   </Button>
@@ -181,6 +220,19 @@ export default function PlansPage() {
           </div>
         </TabsContent>
       </Tabs>
+
+      <div className="mt-12">
+        <h2 className="text-xl font-bold mb-4">Plan Comparison</h2>
+        <Card>
+          <CardContent className="p-0 overflow-hidden">
+          {activeTab === "monthly" ? (
+              <PlanComparison plans={plans.monthly} currentPlanId={currentPlan} />
+            ) : (
+              <PlanComparison plans={plans.yearly} currentPlanId={currentPlan} />
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       {selectedPlan && (
         <div className="mt-8 space-y-6">
